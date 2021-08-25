@@ -98,7 +98,7 @@ void process(void *data);
 
 
 
-#define KNAPSACK_INPUT_FILE "/Users/samiracarolinaolivamadrigal/Desktop/interview_review/interview_review/knapsack_input.in"
+#define KNAPSACK_INPUT_FILE "knapsack_input.in"
 int main(int argc, const char * argv[])
 {
     
