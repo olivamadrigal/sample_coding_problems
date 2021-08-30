@@ -1501,3 +1501,147 @@ int gcompare(void *arg1, void *arg2)
     else
         return 0;
 }
+
+/*
+We can solve without hashing: making a copy of nums, sorting nums once,
+then 2 sequential searches on the copy to map to locate the corresponding indecis.
+
+We can do better: Does not require unsorted search but only sort and a datastrcutre.
+
+Optimality depends on: sort function used. This solutions requires 1 call to sort
+and a data structure and or map to preserve original indecis:value:sorted_idx.
+*/
+typedef struct sums
+{
+    int oidx;
+    int sval;//sorted val & idx
+}SUMS;
+
+void selection_sort_map(SUMS *ary, int last)
+{
+    int cur, mov, smallest, hold, oidx;
+    
+    for(cur = 0; cur < last; cur++)
+    {
+        smallest = cur;
+        for(mov = cur + 1; mov <= last; mov++)
+            if(ary[mov].sval < ary[smallest].sval)
+                smallest = mov;
+        hold =  ary[cur].sval;
+        oidx =  ary[cur].oidx;
+        ary[cur].sval = ary[smallest].sval;
+        ary[cur].oidx = ary[smallest].oidx;
+        ary[smallest].sval = hold;
+        ary[smallest].oidx = oidx;
+    }
+}
+
+int* twoSumLC_optimalV2(int* nums, int numsSize, int target, int* returnSize)
+{
+    
+    int *answer, sum, left, right;
+    bool found;
+    SUMS sorted[numsSize];
+    
+    //MAKE A COPY OF THE ARRAY & save the original index corresponding to each value.
+    for(int i = 0; i < numsSize; i++)
+    {
+        sorted[i].oidx = i;
+        sorted[i].sval = nums[i];
+    }
+    
+    //SORT THE ARRAY AND PRESERVE original VALU:IDX mapping.
+    selection_sort_map(sorted,numsSize-1);
+    
+    //TEST BOUNDS
+    if(!(numsSize >= 2 && numsSize <= (int)pow(10,4)))
+        return NULL;
+    if(!(target >= -(int)pow(10,9) && target <= (int)pow(10,9)))
+        return NULL;
+    
+    //set first and last index of array
+    left = 0;
+    right =  numsSize - 1;
+    answer = (int*)malloc(2*sizeof(int));
+    found = false;
+    while(left < right&& !found)  //travese the copy from both endpoints, inwards.
+    {
+        sum = sorted[left].sval + sorted[right].sval;
+        if(sum == target)
+            found = true;
+        else if(sum < target)//move up from smaller #s
+            left++;
+        else //move down from larger #s
+            right--;
+    }
+    
+    if(found)
+    {   //if found, return the original indecis corresponding to our solution.
+        answer[0] = sorted[left].oidx;
+        answer[1] = sorted[right].oidx;
+    }
+  
+    *returnSize = 2;//TWO INDECIS
+    return answer;
+}
+
+#define TEST_FILE "twosum_test_file.in"
+
+void test_twossum(void)
+{
+    FILE *fp;
+    char buffer[80], *ary, *e, *exp;
+    int nums[5], expected[2], target, size, tv_size, i, returnSize, *actual;
+    bool passed;
+    
+    fp = fopen(TEST_FILE, "r");
+    while(fgets(buffer, 80, fp ))
+    {
+        if(buffer[0] != '#')
+        {
+            target = (int)strtol(strtok(buffer, ":"),(char**)NULL, 10);
+            size =(int)strtol(strtok(NULL, ":"),(char**)NULL, 10);
+            ary =strtok(NULL, ":");
+            exp =strtok(NULL, ":");
+            tv_size = size; i = 0;
+            for(e = strtok(ary, ","); i < tv_size; e = strtok(NULL, ","))
+            {
+                nums[i] = (int)strtol(e,(char**)NULL, 10);i++;
+            }
+            e = strtok(exp, ",");
+            expected[0] =(int)strtol(e,(char**)NULL, 10);
+            e = strtok(NULL, ",");
+            expected[1] =(int)strtol(e,(char**)NULL, 10);
+
+            /*
+            printf("target=%d, size=%d\n", target, size);
+            printf("ary: ");
+            for(int i = 0; i < size; i++)
+            printf("%d ", nums[i]);
+            printf("\n");
+            printf("expected: %d:%d\n", expected[0], expected[1]);puts("\n");
+            */
+            actual = twoSumLC_optimalV2(nums, size, target, &returnSize);
+            //actual = twoSumLC_optimal(nums, size, target, &returnSize);
+            passed = (actual[0] == expected[0] && actual[1] == expected[1]) ||
+                     (actual[1] == expected[0] && actual[0] == expected[1]);
+            if(!passed)
+            {
+                printf("TEST CASE %d FAILED!!", i);
+                printf("target=%d, size=%d\n", target, size);
+                printf("ary: ");
+                for(int i = 0; i < size; i++)
+                    printf("%d ", nums[i]);
+                printf("\n");
+                printf("expected: %d:%d\n", expected[0], expected[1]);puts("\n");
+                printf("actual: %d:%d\n", actual[0], actual[1]);puts("\n");
+                break;
+            }
+
+        }
+
+
+    }
+    fclose(fp);
+}
+
