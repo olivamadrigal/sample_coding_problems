@@ -1,5 +1,5 @@
 #ifndef alien_dictionary_h
-#define alien__dictionary_h
+#define alien_dictionary_h
 
 //Solution written by Samira C. Oliva Madrigal
 //submitted 9/25/2021
@@ -608,4 +608,4 @@ abc, bc valid
 ["a","b","ca","cc"]
 ["a","b","ca","cc"]
 */
-#endif /* alien_lexicon_working_h */
+#endif /* alien_dictionary_h */
