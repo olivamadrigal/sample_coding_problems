@@ -7,6 +7,7 @@
 #include "linked_list.h"
 #include "queue.h"
 #include "graph.h"
+#include "alien_dictionary.h"
 
 /* STRING MANIPULATION, MATH, SEARCH, TREE, AND GRAPH EXERCISES */
 
@@ -434,6 +435,12 @@ int main(int argc, const char * argv[])
     else
         puts("No, there is no path from A(2) to B(4).");
     delete_list_directed_graph(g);
+    
+    //Alien dict
+    int wordsSize = 4;
+    char *words[4] = {"a","b","ca","cc"};// {"ac","ab","b"};//{"ab", "a"}; // {"aa", "a", "ab"};//{"bc","b","cbc"}; //{"wrt","wrf","er","ett","rftt"};
+    printf("%s\n", alienOrder(words, wordsSize));
+    
     return 0;
 }
 
